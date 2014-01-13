@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/underscore-min.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/bigscreen.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/bootstrap.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/Chart.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/jqzabbix.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/index.js"></script>
+
+<link href="./css/bootstrap.min.css" rel="stylesheet">
+<link href="./css/bootstrap-theme.min.css" rel="stylesheet">
+<link href="./css/style.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+<div class='container'>
+
+<div class='page-header'>
+  <a href="https://kistanoc.ssvl.kth.se/zabbix" target="_blank" type="button" class="btn btn-primary pull-right" >Launch Zabbix Dashboard</a>
+  <a id="full_screen_button" href="#" target="_blank" type="button" class="btn btn-success pull-right" >Full Screen</a>
+  <h1>Zabbix Statistics</h1>
+  <p id="user" style="display:none;"></p>
+</div>
+
+<ul class="nav nav-tabs" id="myTab">
+  <li><a class="active" href="#tab-overview" data-toggle="tab">Overview</a></li>
+  <li><a href="#tab-temperature" data-toggle="tab">Temperature</a></li>
+  <li><a href="#tab-charge" data-toggle="tab">Charge Controller</a></li>
+  <li><a href="#tab-cpu" data-toggle="tab">CPU</a></li>
+  <li><a href="#tab-memory" data-toggle="tab">Memory</a></li>
+  <li><a href="#tab-disk" data-toggle="tab">Disk</a></li>
+  <li><a href="#tab-console" data-toggle="tab">Console</a></li>
+</ul>
+
+<div class='tab-content'>
+  <div class='tab-pane active fade in' id='tab-overview'>
+    <div class='row'>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>Hosts status:</strong></p>
+        <ul id="ul_host_status"></ul>
+      </div>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>System uptime (hours):</strong></p>
+        <canvas id="chart_system_uptime" width="400" height="400"></canvas>
+      </div>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>Number of logged in users:</strong></p>
+        <canvas id="chart_loggedin_user_num" width="400" height="400"></canvas>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>System Information:</strong></p>
+        <ul id="ul_system_uname"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class='tab-pane fade' id='tab-console'>
+    <p>
+      <a href='https://www.zabbix.com/documentation/2.0/manual/appendix/api/api' target='_blank'>Reference: Zabbix API Documentation</a>
+    </p>
+    <div class='row'>
+      <div class='col-md-6'>
+        <form id="theform" role="form">
+          <label>Method:</label>
+          <input id="method" type="text" /><br />
+          <label>Params:</label><br />
+          <table border=1 id="param_table" class="table table-hover table-condensed">
+            <thead>
+              <tr><td>Key</td><td>Value</td><td><a id="add_param" href="#">Add</a></td></tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <input id="invoke_button" class="btn btn-primary" type="submit" value="invoke" />
+        </form>
+    </div>
+  </div>
+
+    <p>Result:</p>
+    <div id="result"></div>
+
+    <p>Error:</p>
+    <div id="error"></div>
+  </div><!-- #tab-console -->
+
+  <div class='tab-pane fade' id='tab-cpu'>
+    <div class='row'>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>CPU idle time (%)</strong></p>
+        <canvas id="chart_cpu_idle_time" width="400" height="400"></canvas>
+      </div>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>CPU system time (%)</strong></p>
+        <canvas id="chart_cpu_system_time" width="400" height="400"></canvas>
+      </div>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>CPU user time (%)</strong></p>
+        <canvas id="chart_cpu_user_time" width="400" height="400"></canvas>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>CPU time waiting for IO to complete (%)</strong></p>
+        <canvas id="chart_cpu_iowait_time" width="400" height="400"></canvas>
+      </div>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>CPU interrupt time (%)</strong></p>
+        <canvas id="chart_cpu_interrupt_time" width="400" height="400"></canvas>
+      </div>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>CPU softtrq time (%)</strong></p>
+        <canvas id="chart_cpu_softirq_time" width="400" height="400"></canvas>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>CPU nice time (%)</strong></p>
+        <canvas id="chart_cpu_nice_time" width="400" height="400"></canvas>
+      </div>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>CPU steal time (%)</strong></p>
+        <canvas id="chart_cpu_steal_time" width="400" height="400"></canvas>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class='row'>
+      <p class="col-md-4 text-center"><span style="color:#30f386;" class="glyphicon glyphicon-stop"></span>CPU Idle Time</p>
+      <p class="col-md-4 text-center"><span style="color:#303cf3;" class="glyphicon glyphicon-stop"></span>CPU System Time</p>
+      <p class="col-md-4 text-center"><span style="color:#f3309d;" class="glyphicon glyphicon-stop"></span>CPU User Time</p>
+    </div>
+    <div id="div_cpu_times_hosts">
+    </div>
+  </div>
+
+  <div class='tab-pane fade' id='tab-memory'>
+    <div class='row'>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>Available memory (MB):</strong></p>
+        <canvas id="chart_available_memory" width="400" height="400"></canvas>
+      </div>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>Total memory (MB):</strong></p>
+        <canvas id="chart_total_memory" width="400" height="400"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class='tab-pane fade' id='tab-disk'>
+    <div class='row'>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>Free disk space on / (MB):</strong></p>
+        <canvas id="chart_free_disk_space" width="400" height="400"></canvas>
+      </div>
+      <div class='col-md-4'>
+        <p class='text-center'><strong>Free disk space on /home (MB):</strong></p>
+        <canvas id="chart_home_free_disk_space" width="400" height="400"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class='tab-pane fade' id='tab-temperature'>
+    <div class='row'>
+      <table id='table_temperature' class='table table-hover tablesorter'>
+        <thead>
+          <tr>
+            <th>Report from host</th>
+            <th>Description</th>
+            <th>Temperature (Celsius)</th>
+          </tr>
+        </thead>
+        <tbody id='tbody_temperature'>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class='tab-pane fade' id='tab-charge'>
+  </div>
+
+</div><!-- .tab-content -->
+
+</div><!-- .continer -->
+</body>
+</html>
